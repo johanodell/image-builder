@@ -6,7 +6,7 @@
     rhel_image_update_host: false
 
     rhel_image_git_remote_repo: https://github.com/johanodell/rhel-image.git
-    rhel_image_git_repo_checkout: master
+    rhel_image_git_repo_checkout: main
     rhel_image_blueprint: rhel-golden-image
     rhel_image_output_type: qcow2
     # Optional image filename to use instead of UUID
