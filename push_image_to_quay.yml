@@ -21,6 +21,7 @@
         src: "{{ qcow2_file_path }}"
         dest: /tmp/container_build/
         remote_src: yes
+        mode: '0644'
 
     - name: Create Containerfile for the container
       ansible.builtin.copy:
