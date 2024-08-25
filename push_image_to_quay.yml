@@ -27,8 +27,8 @@
         dest: /tmp/container_build/Containerfile
         content: |
           FROM scratch
-          ADD {{ qcow2_file_path | basename }} /disk.qcow2
-          # You can add more commands here to customize your container
+          ADD ci-daily-image.qcow2 /disk
+          RUN chmod 644 /disk 
 
     - name: Build the container image using Podman
       containers.podman.podman_image:
