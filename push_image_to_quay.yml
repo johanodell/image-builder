@@ -4,7 +4,7 @@
   become: true
   vars:
     qcow2_file_path: /tmp/images/ci-daily-image.qcow2
-    container_image_name: https://quay.io/codell/rhel9-golden
+    container_image_name: quay.io/codell/rhel9-golden
     container_image_tag: latest  #"{{ ansible_date_time.date | strftime('%Y-%m-%d') }}"
 
     quay_username: "{{ quay_username }}"
