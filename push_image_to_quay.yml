@@ -1,6 +1,6 @@
 ---
 - name: Build, tag, and push container image to Quay
-  hosts: remote_host
+  hosts: all 
   become: true
   vars:
     qcow2_file_path: /tmp/images/ci-daily-image.qcow2
