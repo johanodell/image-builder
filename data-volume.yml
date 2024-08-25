@@ -1,0 +1,16 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: rhel9-golden-datavolume
+  namespace: 00-infra-vms 
+spec:
+  source:
+    registry:
+      url: "docker://quay.io/codell/rhel9-golden:latest"
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+
