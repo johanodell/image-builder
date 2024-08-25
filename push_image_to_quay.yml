@@ -22,9 +22,9 @@
         dest: /tmp/container_build/
         remote_src: yes
 
-    - name: Create containerfile for the container
+    - name: Create Containerfile for the container
       ansible.builtin.copy:
-        dest: /tmp/container_build/containerfile
+        dest: /tmp/container_build/Containerfile
         content: |
           FROM scratch
           ADD {{ qcow2_file_path | basename }} /disk.qcow2
