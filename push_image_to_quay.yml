@@ -29,7 +29,6 @@
         content: |
           FROM scratch
           ADD ci-daily-image.qcow2 /disk
-          RUN chmod 644 /disk 
 
     - name: Build the container image using Podman
       containers.podman.podman_image:
@@ -37,8 +36,6 @@
         tag: "{{ container_image_tag }}"
         path: /tmp/container_build
         state: present
-        build:
-          extra_args: ["--no-cache"]
 
     - name: Log in to Quay
       containers.podman.podman_login:
