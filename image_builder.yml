@@ -1,6 +1,6 @@
 ---
 - name: Build RHEL image with Image Builder
-  hosts: all
+  hosts: rhel-virt-builder
   become: true
   vars:
     rhel_image_update_host: false
