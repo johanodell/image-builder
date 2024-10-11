@@ -1,0 +1,144 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: virt-corp-rhel9-server-medium
+  namespace: openshift
+  annotations:
+    description: "Template for creating RHEL 9 VMs based on virt-corp's RHEL 9 image"
+    tags: "hidden,kubevirt,virtualmachine,linux,rhel,virt-corp"
+    openshift.io/display-name: "Red Hat Enterprise Linux 9 VM (virt-corp)"
+    openshift.io/provider-display-name: "virt-corp"
+    openshift.io/documentation-url: "https://www.virt-corp.com/docs"
+    openshift.io/support-url: "https://www.virt-corp.com/support"
+    openshift.kubevirt.io/pronounceable-suffix-for-name-expression: "true"
+    defaults.template.kubevirt.io/disk: rootdisk
+    template.kubevirt.io/editable: |
+      /objects[0].spec.template.spec.domain.cpu.sockets
+      /objects[0].spec.template.spec.domain.cpu.cores
+      /objects[0].spec.template.spec.domain.cpu.threads
+      /objects[0].spec.template.spec.domain.memory.guest
+      /objects[0].spec.template.spec.domain.devices.disks
+      /objects[0].spec.template.spec.volumes
+      /objects[0].spec.template.spec.networks
+    template.kubevirt.io/images: "https://www.virt-corp.com/downloads/rhel9"
+    template.kubevirt.io/provider: "virt-corp"
+    template.kubevirt.io/provider-support-level: "Full"
+    template.kubevirt.io/provider-url: "https://www.virt-corp.com"
+    template.kubevirt.io/version: "v1alpha1"
+    template.openshift.io/bindable: "false"
+    iconClass: icon-rhel
+    name.os.template.kubevirt.io/rhel9.0: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.1: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.2: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.3: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.4: "Red Hat Enterprise Linux 9.0 or higher"
+    name.os.template.kubevirt.io/rhel9.5: "Red Hat Enterprise Linux 9.0 or higher"
+  labels:
+    app.kubernetes.io/component: templating
+    app.kubernetes.io/managed-by: ssp-operator
+    app.kubernetes.io/name: common-templates
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    app.kubernetes.io/version: 4.16.3
+    flavor.template.kubevirt.io/medium: "true"
+    os.template.kubevirt.io/rhel9.0: "true"
+    os.template.kubevirt.io/rhel9.1: "true"
+    os.template.kubevirt.io/rhel9.2: "true"
+    os.template.kubevirt.io/rhel9.3: "true"
+    os.template.kubevirt.io/rhel9.4: "true"
+    os.template.kubevirt.io/rhel9.5: "true"
+    template.kubevirt.io/type: base
+    template.kubevirt.io/version: v0.29.2
+    workload.template.kubevirt.io/server: "true"
+objects:
+- apiVersion: kubevirt.io/v1
+  kind: VirtualMachine
+  metadata:
+    name: "${NAME}"
+    labels:
+      app: "${NAME}"
+      vm.kubevirt.io/template: virt-corp-rhel9-server-medium
+      vm.kubevirt.io/template.namespace: openshift
+      flavor.template.kubevirt.io/medium: "true"
+      os.template.kubevirt.io/rhel9.0: "true"
+      os.template.kubevirt.io/rhel9.1: "true"
+      os.template.kubevirt.io/rhel9.2: "true"
+      os.template.kubevirt.io/rhel9.3: "true"
+      os.template.kubevirt.io/rhel9.4: "true"
+      os.template.kubevirt.io/rhel9.5: "true"
+      workload.template.kubevirt.io/server: "true"
+  spec:
+    running: false
+    dataVolumeTemplates:
+    - metadata:
+        name: rootdisk
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: "virt-corp-rhel9"  
+          namespace: "openshift-virtualization-os-images"
+        storage:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 30Gi
+    template:
+      metadata:
+        labels:
+          kubevirt.io/domain: "${NAME}"
+      spec:
+        domain:
+          cpu:
+            sockets: 1
+            cores: 2
+            threads: 1
+          resources:
+            requests:
+              memory: 4Gi
+          devices:
+            disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+            interfaces:
+            - name: default
+              masquerade: {}
+            rng: {}
+          features:
+            acpi: {}
+            smm:
+              enabled: true
+          firmware:
+            bootloader:
+              efi: {}
+          machine:
+            type: q35
+        volumes:
+        - name: rootdisk
+          dataVolume:
+            name: rootdisk
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: cloud-user
+              password: ${CLOUD_USER_PASSWORD}
+              chpasswd:
+                expire: false
+        networks:
+        - name: default
+          pod: {}
+parameters:
+- name: NAME
+  description: "VM name"
+  required: false
+  generate: expression
+  from: "virt-corp-[a-z0-9]{16}"
+- name: CLOUD_USER_PASSWORD
+  description: "Randomized password for the cloud-init user cloud-user"
+  required: false
+  generate: expression
+  from: "[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}"
